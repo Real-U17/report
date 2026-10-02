@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("STAFF") // ADMIN, STAFF
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FloodReport {
+  id          String   @id @default(uuid())
+  description String   @db.Text
+  latitude    Float
+  longitude   Float
+  severity    Int      // 1-5
+  imageUrl    String?
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED, RESOLVED
+  province    String
+  district    String
+  reporterId  String?  // If we want users to log in, but for citizens, it can be anonymous
+  phone       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model WaterLevelStation {
+  id          String   @id @default(uuid())
+  name        String
+  province    String
+  river       String
+  latitude    Float
+  longitude   Float
+  dangerLevel Float
+  currentLevel Float
+  updatedAt   DateTime @updatedAt
+}
+
+model Shelter {
+  id          String   @id @default(uuid())
+  name        String
+  address     String   @db.Text
+  province    String
+  latitude    Float
+  longitude   Float
+  capacity    Int
+  occupied    Int      @default(0)
+  contactInfo String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Alert {
+  id          String   @id @default(uuid())
+  title       String
+  content     String   @db.Text
+  severity    String   @default("INFO") // INFO, WARNING, CRITICAL
+  province    String?  // Null means nationwide
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
