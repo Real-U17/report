@@ -4,16 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ReportMapWrapper from "@/components/ReportMapWrapper";
 
-const PROVINCES = [
-  "กรุงเทพมหานคร", "กระบี่", "กาญจนบุรี", "กาฬสินธุ์", "กำแพงเพชร", "ขอนแก่น", "จันทบุรี", "ฉะเชิงเทรา", "ชลบุรี", "ชัยนาท", 
-  "ชัยภูมิ", "ชุมพร", "เชียงราย", "เชียงใหม่", "ตรัง", "ตราด", "ตาก", "นครนายก", "นครปฐม", "นครพนม", 
-  "นครราชสีมา", "นครศรีธรรมราช", "นครสวรรค์", "นนทบุรี", "นราธิวาส", "น่าน", "บึงกาฬ", "บุรีรัมย์", "ปทุมธานี", "ประจวบคีรีขันธ์", 
-  "ปราจีนบุรี", "ปัตตานี", "พระนครศรีอยุธยา", "พะเยา", "พังงา", "พัทลุง", "พิจิตร", "พิษณุโลก", "เพชรบุรี", "เพชรบูรณ์", 
-  "แพร่", "ภูเก็ต", "มหาสารคาม", "มุกดาหาร", "แม่ฮ่องสอน", "ยโสธร", "ยะลา", "ร้อยเอ็ด", "ระนอง", "ระยอง", 
-  "ราชบุรี", "ลพบุรี", "ลำปาง", "ลำพูน", "เลย", "ศรีสะเกษ", "สกลนคร", "สงขลา", "สตูล", "สมุทรปราการ", 
-  "สมุทรสงคราม", "สมุทรสาคร", "สระแก้ว", "สระบุรี", "สิงห์บุรี", "สุโขทัย", "สุพรรณบุรี", "สุราษฎร์ธานี", "สุรินทร์", "หนองคาย", 
-  "หนองบัวลำภู", "อ่างทอง", "อำนาจเจริญ", "อุดรธานี", "อุตรดิตถ์", "อุทัยธานี", "อุบลราชธานี"
-];
+import PROVINCE_DISTRICTS from "@/lib/province_districts.json";
 
 const WATER_LEVELS = [
   { level: "1", label: "ระดับตาตุ่ม", desc: "มีน้ำขัง รอการระบาย", height: "15%", color: "#38bdf8" },
@@ -116,16 +107,21 @@ export default function ReportPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: '#334155' }}>จังหวัด</label>
-            <select required name="province" value={formData.province} onChange={handleChange} style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', outline: 'none', cursor: 'pointer', transition: 'border 0.3s' }}>
+            <select required name="province" value={formData.province} onChange={(e) => setFormData({...formData, province: e.target.value, district: ""})} style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', outline: 'none', cursor: 'pointer', transition: 'border 0.3s' }}>
               <option value="" disabled>-- เลือกจังหวัด --</option>
-              {PROVINCES.map(prov => (
+              {Object.keys(PROVINCE_DISTRICTS).sort().map(prov => (
                 <option key={prov} value={prov}>{prov}</option>
               ))}
             </select>
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: '#334155' }}>อำเภอ/เขต</label>
-            <input required type="text" name="district" value={formData.district} onChange={handleChange} placeholder="เช่น แม่สาย" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', outline: 'none', transition: 'border 0.3s' }} onFocus={(e) => e.target.style.borderColor = '#0ea5e9'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+            <select required name="district" value={formData.district} onChange={handleChange} disabled={!formData.province} style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: formData.province ? '#ffffff' : '#f1f5f9', color: '#0f172a', outline: 'none', cursor: formData.province ? 'pointer' : 'not-allowed', transition: 'border 0.3s' }}>
+              <option value="" disabled>-- เลือกอำเภอ/เขต --</option>
+              {formData.province && (PROVINCE_DISTRICTS as any)[formData.province]?.map((dist: string) => (
+                <option key={dist} value={dist}>{dist}</option>
+              ))}
+            </select>
           </div>
         </div>
 
