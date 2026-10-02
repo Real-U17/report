@@ -1,26 +1,14 @@
 :root {
-  --background: #f0f4f8;
-  --foreground: #1e293b;
+  --background: #f8fafc;
+  --foreground: #0f172a;
   --primary: #0284c7;
   --primary-hover: #0369a1;
   --accent: #38bdf8;
-  --card-bg: rgba(255, 255, 255, 0.7);
-  --card-border: rgba(255, 255, 255, 0.5);
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --card-border: rgba(226, 232, 240, 0.8);
   --danger: #ef4444;
   --warning: #f59e0b;
   --success: #10b981;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    --foreground: #f8fafc;
-    --primary: #0ea5e9;
-    --primary-hover: #38bdf8;
-    --accent: #bae6fd;
-    --card-bg: rgba(30, 41, 59, 0.7);
-    --card-border: rgba(51, 65, 85, 0.5);
-  }
 }
 
 * {
