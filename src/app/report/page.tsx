@@ -4,6 +4,38 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ReportMapWrapper from "@/components/ReportMapWrapper";
 
+const PROVINCES = [
+  "กรุงเทพมหานคร", "กระบี่", "กาญจนบุรี", "กาฬสินธุ์", "กำแพงเพชร", "ขอนแก่น", "จันทบุรี", "ฉะเชิงเทรา", "ชลบุรี", "ชัยนาท", 
+  "ชัยภูมิ", "ชุมพร", "เชียงราย", "เชียงใหม่", "ตรัง", "ตราด", "ตาก", "นครนายก", "นครปฐม", "นครพนม", 
+  "นครราชสีมา", "นครศรีธรรมราช", "นครสวรรค์", "นนทบุรี", "นราธิวาส", "น่าน", "บึงกาฬ", "บุรีรัมย์", "ปทุมธานี", "ประจวบคีรีขันธ์", 
+  "ปราจีนบุรี", "ปัตตานี", "พระนครศรีอยุธยา", "พะเยา", "พังงา", "พัทลุง", "พิจิตร", "พิษณุโลก", "เพชรบุรี", "เพชรบูรณ์", 
+  "แพร่", "ภูเก็ต", "มหาสารคาม", "มุกดาหาร", "แม่ฮ่องสอน", "ยโสธร", "ยะลา", "ร้อยเอ็ด", "ระนอง", "ระยอง", 
+  "ราชบุรี", "ลพบุรี", "ลำปาง", "ลำพูน", "เลย", "ศรีสะเกษ", "สกลนคร", "สงขลา", "สตูล", "สมุทรปราการ", 
+  "สมุทรสงคราม", "สมุทรสาคร", "สระแก้ว", "สระบุรี", "สิงห์บุรี", "สุโขทัย", "สุพรรณบุรี", "สุราษฎร์ธานี", "สุรินทร์", "หนองคาย", 
+  "หนองบัวลำภู", "อ่างทอง", "อำนาจเจริญ", "อุดรธานี", "อุตรดิตถ์", "อุทัยธานี", "อุบลราชธานี"
+];
+
+const WATER_LEVELS = [
+  { level: "1", label: "ระดับตาตุ่ม", desc: "มีน้ำขัง รอการระบาย", height: "15%", color: "#38bdf8" },
+  { level: "2", label: "ระดับเข่า", desc: "รถเล็กผ่านลำบาก", height: "35%", color: "#0ea5e9" },
+  { level: "3", label: "ระดับเอว", desc: "เข้าบ้านเรือนบางส่วน", height: "55%", color: "#0284c7" },
+  { level: "4", label: "ระดับอก", desc: "ต้องใช้เรือสัญจร", height: "75%", color: "#dc2626" },
+  { level: "5", label: "มิดหัว", desc: "วิกฤต ตัดขาดการสัญจร", height: "100%", color: "#991b1b" }
+];
+
+function PersonSVG() {
+  return (
+    <svg viewBox="0 0 100 150" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
+      <circle cx="50" cy="25" r="16" fill="#94a3b8" />
+      <rect x="36" y="45" width="28" height="45" rx="10" fill="#94a3b8" />
+      <rect x="20" y="50" width="12" height="40" rx="6" fill="#94a3b8" />
+      <rect x="68" y="50" width="12" height="40" rx="6" fill="#94a3b8" />
+      <rect x="36" y="85" width="11" height="50" rx="5" fill="#94a3b8" />
+      <rect x="53" y="85" width="11" height="50" rx="5" fill="#94a3b8" />
+    </svg>
+  );
+}
+
 export default function ReportPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -66,10 +98,10 @@ export default function ReportPage() {
   }
 
   return (
-    <div style={{ maxWidth: '800px', margin: '3rem auto', background: '#ffffff', borderRadius: '1.5rem', boxShadow: '0 10px 30px rgba(2, 132, 199, 0.1)', padding: '2.5rem', borderTop: '6px solid #0ea5e9' }}>
+    <div style={{ maxWidth: '900px', margin: '3rem auto', background: '#ffffff', borderRadius: '1.5rem', boxShadow: '0 10px 30px rgba(2, 132, 199, 0.1)', padding: '2.5rem', borderTop: '6px solid #0ea5e9' }}>
       <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
         <h1 style={{ color: '#0369a1', fontSize: '2.2rem', marginBottom: '0.5rem' }}>แบบฟอร์มแจ้งเหตุน้ำท่วม</h1>
-        <p style={{ color: '#64748b' }}>ระบุตำแหน่งบนแผนที่และให้ข้อมูลเพื่อขอความช่วยเหลือหรือแจ้งเตือน</p>
+        <p style={{ color: '#64748b' }}>ระบุตำแหน่งและรายละเอียดเพื่อให้หน่วยงานที่เกี่ยวข้องเข้าช่วยเหลือ</p>
       </div>
       
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -78,17 +110,18 @@ export default function ReportPage() {
         <div style={{ background: '#f8fafc', padding: '1.5rem', borderRadius: '1rem', border: '1px solid #e2e8f0' }}>
           <label style={{ display: 'block', marginBottom: '1rem', fontWeight: 600, color: '#0f172a', fontSize: '1.1rem' }}>1. เลือกจุดที่เกิดเหตุ (คลิกบนแผนที่)</label>
           <ReportMapWrapper onLocationSelect={handleLocationSelect} initialLat={formData.latitude} initialLng={formData.longitude} />
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-            <input type="text" value={`ละติจูด: ${formData.latitude}`} readOnly style={{ flex: 1, padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: '#f1f5f9', color: '#475569' }} />
-            <input type="text" value={`ลองจิจูด: ${formData.longitude}`} readOnly style={{ flex: 1, padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: '#f1f5f9', color: '#475569' }} />
-          </div>
         </div>
 
         {/* Location Details */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: '#334155' }}>จังหวัด</label>
-            <input required type="text" name="province" value={formData.province} onChange={handleChange} placeholder="เช่น เชียงราย" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', outline: 'none', transition: 'border 0.3s' }} onFocus={(e) => e.target.style.borderColor = '#0ea5e9'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+            <select required name="province" value={formData.province} onChange={handleChange} style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', outline: 'none', cursor: 'pointer', transition: 'border 0.3s' }}>
+              <option value="" disabled>-- เลือกจังหวัด --</option>
+              {PROVINCES.map(prov => (
+                <option key={prov} value={prov}>{prov}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: '#334155' }}>อำเภอ/เขต</label>
@@ -96,30 +129,76 @@ export default function ReportPage() {
           </div>
         </div>
 
-        {/* Severity */}
+        {/* Severity Visual Cards */}
         <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: '#334155' }}>ระดับความรุนแรง</label>
-          <select required name="severity" value={formData.severity} onChange={handleChange} style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', outline: 'none', cursor: 'pointer' }}>
-            <option value="1">ระดับ 1 - มีน้ำขังรอการระบาย</option>
-            <option value="2">ระดับ 2 - น้ำท่วมผิวจราจร รถเล็กผ่านลำบาก</option>
-            <option value="3">ระดับ 3 - น้ำเข้าบ้านเรือน ได้รับความเสียหายบางส่วน</option>
-            <option value="4">ระดับ 4 - น้ำท่วมสูง ต้องใช้เรือในการสัญจร</option>
-            <option value="5">ระดับ 5 - วิกฤต ตัดขาดการสัญจร ต้องการความช่วยเหลือด่วน</option>
-          </select>
+          <label style={{ display: 'block', marginBottom: '1rem', fontWeight: 600, color: '#0f172a', fontSize: '1.1rem' }}>ระดับน้ำ (คลิกเลือกที่รูปภาพ)</label>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
+            {WATER_LEVELS.map((level) => {
+              const isSelected = formData.severity === level.level;
+              return (
+                <div 
+                  key={level.level}
+                  onClick={() => setFormData({ ...formData, severity: level.level })}
+                  style={{
+                    border: `2px solid ${isSelected ? level.color : '#e2e8f0'}`,
+                    borderRadius: '1rem',
+                    padding: '1rem 0.5rem',
+                    cursor: 'pointer',
+                    background: isSelected ? '#f0f9ff' : '#ffffff',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    transition: 'all 0.2s',
+                    transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                    boxShadow: isSelected ? `0 4px 12px ${level.color}33` : 'none'
+                  }}
+                >
+                  <div style={{ width: '60px', height: '100px', position: 'relative', overflow: 'hidden', marginBottom: '1rem' }}>
+                    <PersonSVG />
+                    {/* Water Overlay */}
+                    <div style={{ 
+                      position: 'absolute', 
+                      bottom: 0, 
+                      left: 0, 
+                      width: '100%', 
+                      height: level.height, 
+                      background: level.color, 
+                      opacity: 0.7,
+                      transition: 'height 0.5s ease-in-out'
+                    }}>
+                      {/* Wave Effect */}
+                      <div style={{
+                        position: 'absolute',
+                        top: '-5px',
+                        left: 0,
+                        width: '100%',
+                        height: '10px',
+                        background: `radial-gradient(circle at 5px 10px, transparent 5px, ${level.color} 6px)`,
+                        backgroundSize: '10px 10px'
+                      }}></div>
+                    </div>
+                  </div>
+                  <strong style={{ color: isSelected ? level.color : '#334155', fontSize: '1.05rem', textAlign: 'center' }}>{level.label}</strong>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b', textAlign: 'center', marginTop: '0.25rem' }}>{level.desc}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Description */}
         <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: '#334155' }}>รายละเอียดเพิ่มเติม</label>
-          <textarea required name="description" value={formData.description} onChange={handleChange} rows={4} placeholder="อธิบายสถานการณ์ เช่น น้ำสูงประมาณ 50 ซม. หรือ ต้องการอาหารและน้ำดื่ม" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', outline: 'none', resize: 'vertical' }}></textarea>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: '#334155' }}>รายละเอียดเพิ่มเติม (ไม่บังคับ)</label>
+          <textarea name="description" value={formData.description} onChange={handleChange} rows={3} placeholder="อธิบายสถานการณ์เพิ่มเติม เช่น ต้องการความช่วยเหลือด้านใดเป็นพิเศษ" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', outline: 'none', resize: 'vertical' }}></textarea>
         </div>
 
         {/* Submit Button (Red) */}
         <button type="submit" disabled={loading} style={{ marginTop: '1rem', padding: '1.25rem', fontSize: '1.2rem', fontWeight: 'bold', background: 'linear-gradient(135deg, #ef4444, #dc2626)', color: 'white', borderRadius: '0.75rem', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', width: '100%', boxShadow: '0 4px 14px rgba(239, 68, 68, 0.4)', transition: 'transform 0.2s' }} onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
-          {loading ? 'กำลังส่งข้อมูล...' : 'ส่งรายงานแจ้งเหตุ 🚨'}
+          {loading ? 'กำลังส่งข้อมูล...' : 'ส่งรายงานแจ้งเหตุด่วน 🚨'}
         </button>
       </form>
     </div>
   );
 }
+
 
