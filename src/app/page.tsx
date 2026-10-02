@@ -51,7 +51,7 @@ export default function Home() {
           <p style={{ margin: '0 auto 2rem', opacity: 0.8, maxWidth: '500px', fontSize: '1.1rem' }}>
             ร่วมรายงานสถานการณ์ในพื้นที่ของคุณ เพื่อช่วยเหลือและแจ้งเตือนผู้อื่นให้ปลอดภัย
           </p>
-          <Link href="/report" className="report-btn" style={{ fontSize: '1.2rem', padding: '1rem 3rem', display: 'inline-block' }}>
+          <Link href="/report" target="_blank" rel="noopener noreferrer" className="report-btn" style={{ fontSize: '1.2rem', padding: '1rem 3rem', display: 'inline-block' }}>
             แจ้งเหตุน้ำท่วมด่วน
           </Link>
         </div>
