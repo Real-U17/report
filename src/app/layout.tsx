@@ -28,7 +28,7 @@ export default function RootLayout({
           </div>
           <div className="nav-links">
             <a href="/" className="nav-link active">หน้าแรก</a>
-            <a href="/provinces" className="nav-link">รายจังหวัด</a>
+            <a href="/admin" className="nav-link">สำหรับเจ้าหน้าที่</a>
             <a href="/report" className="nav-link report-btn">แจ้งเหตุ</a>
           </div>
         </nav>

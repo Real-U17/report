@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
@@ -19,7 +19,7 @@ model User {
 
 model FloodReport {
   id          String   @id @default(uuid())
-  description String   @db.Text
+  description String
   latitude    Float
   longitude   Float
   severity    Int      // 1-5
@@ -48,7 +48,7 @@ model WaterLevelStation {
 model Shelter {
   id          String   @id @default(uuid())
   name        String
-  address     String   @db.Text
+  address     String
   province    String
   latitude    Float
   longitude   Float
@@ -63,7 +63,7 @@ model Shelter {
 model Alert {
   id          String   @id @default(uuid())
   title       String
-  content     String   @db.Text
+  content     String
   severity    String   @default("INFO") // INFO, WARNING, CRITICAL
   province    String?  // Null means nationwide
   isActive    Boolean  @default(true)
