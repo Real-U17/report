@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -25,6 +25,14 @@ function LocationMarker({ position, setPosition }: { position: [number, number],
   );
 }
 
+function MapUpdater({ position }: { position: [number, number] }) {
+  const map = useMap();
+  useEffect(() => {
+    map.flyTo(position, map.getZoom(), { animate: true, duration: 1.5 });
+  }, [position, map]);
+  return null;
+}
+
 interface ReportMapProps {
   onLocationSelect: (lat: string, lng: string) => void;
   initialLat: string;
@@ -38,6 +46,15 @@ export default function ReportMap({ onLocationSelect, initialLat, initialLng }: 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Update position if props change externally
+  useEffect(() => {
+    const lat = Number(initialLat);
+    const lng = Number(initialLng);
+    if (!isNaN(lat) && !isNaN(lng) && (lat !== position[0] || lng !== position[1])) {
+      setPosition([lat, lng]);
+    }
+  }, [initialLat, initialLng]);
 
   useEffect(() => {
     onLocationSelect(position[0].toString(), position[1].toString());
@@ -58,6 +75,7 @@ export default function ReportMap({ onLocationSelect, initialLat, initialLng }: 
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <LocationMarker position={position} setPosition={setPosition} />
+        <MapUpdater position={position} />
       </MapContainer>
       <div style={{ position: "absolute", top: "10px", right: "10px", zIndex: 400, background: "rgba(255,255,255,0.9)", padding: "0.5rem 1rem", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.2)", fontSize: "0.9rem", color: "#1e293b", fontWeight: "bold" }}>
         👆 คลิกบนแผนที่เพื่อระบุพิกัด

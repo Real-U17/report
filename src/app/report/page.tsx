@@ -107,7 +107,28 @@ export default function ReportPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: '#334155' }}>จังหวัด</label>
-            <select required name="province" value={formData.province} onChange={(e) => setFormData({...formData, province: e.target.value, district: ""})} style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', outline: 'none', cursor: 'pointer', transition: 'border 0.3s' }}>
+            <select 
+              required 
+              name="province" 
+              value={formData.province} 
+              onChange={async (e) => {
+                const prov = e.target.value;
+                setFormData(prev => ({...prev, province: prov, district: ""}));
+                // Geocode province to update map
+                try {
+                  const res = await fetch(`https://nominatim.openstreetmap.org/search?q=จังหวัด${prov}+ประเทศไทย&format=json&limit=1`, {
+                    headers: { 'Accept-Language': 'th' }
+                  });
+                  const data = await res.json();
+                  if (data && data.length > 0) {
+                    setFormData(prev => ({ ...prev, latitude: data[0].lat, longitude: data[0].lon }));
+                  }
+                } catch (err) {
+                  console.error("Geocoding failed", err);
+                }
+              }} 
+              style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', outline: 'none', cursor: 'pointer', transition: 'border 0.3s' }}
+            >
               <option value="" disabled>-- เลือกจังหวัด --</option>
               {Object.keys(PROVINCE_DISTRICTS).sort().map(prov => (
                 <option key={prov} value={prov}>{prov}</option>
