@@ -1,19 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-const customIcon = new L.Icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-});
+// Create custom icons based on severity
+const createCustomIcon = (color: string) => {
+  return L.divIcon({
+    className: "custom-div-icon",
+    html: `<div style="background-color: ${color}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px ${color};"></div>`,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+    popupAnchor: [0, -10]
+  });
+};
+
+const getSeverityColor = (severity: number) => {
+  if (severity === 1) return "#38bdf8";
+  if (severity === 2) return "#0ea5e9";
+  if (severity === 3) return "#0284c7";
+  if (severity === 4) return "#dc2626";
+  return "#991b1b";
+};
 
 export default function FloodMap() {
   const [mounted, setMounted] = useState(false);
@@ -37,7 +46,7 @@ export default function FloodMap() {
     <MapContainer 
       center={center} 
       zoom={6} 
-      scrollWheelZoom={false} 
+      scrollWheelZoom={true} 
       style={{ height: "100%", width: "100%", zIndex: 1 }}
     >
       <TileLayer
@@ -46,23 +55,22 @@ export default function FloodMap() {
       />
       
       {reports.map((report) => (
-        <Circle 
+        <Marker 
           key={report.id} 
-          center={[report.latitude, report.longitude]} 
-          radius={10000 + (report.severity * 2000)} 
-          pathOptions={{ 
-            color: report.severity >= 4 ? 'red' : 'orange', 
-            fillColor: report.severity >= 4 ? '#fca5a5' : '#fde047', 
-            fillOpacity: 0.5 
-          }}
+          position={[report.latitude, report.longitude]} 
+          icon={createCustomIcon(getSeverityColor(report.severity))}
         >
           <Popup>
-            <strong>อ.{report.district}, จ.{report.province}</strong><br/>
-            ความรุนแรง: ระดับ {report.severity}<br/>
-            รายละเอียด: {report.description}<br/>
-            สถานะ: {report.status === "PENDING" ? "รอการตรวจสอบ" : "ยืนยันแล้ว"}
+            <div style={{ fontFamily: 'var(--font-prompt), sans-serif' }}>
+              <strong style={{ fontSize: '1.1rem', color: '#0f172a' }}>อ.{report.district}, จ.{report.province}</strong><br/>
+              <span style={{ color: getSeverityColor(report.severity), fontWeight: 'bold' }}>ความรุนแรง: ระดับ {report.severity}</span><br/>
+              <p style={{ margin: '0.5rem 0', color: '#475569' }}>{report.description || "ไม่มีรายละเอียดเพิ่มเติม"}</p>
+              <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                สถานะ: {report.status === "PENDING" ? "รอการตรวจสอบ ⏳" : "ยืนยันแล้ว ✅"}
+              </div>
+            </div>
           </Popup>
-        </Circle>
+        </Marker>
       ))}
       
     </MapContainer>
